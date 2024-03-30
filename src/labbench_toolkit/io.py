@@ -52,8 +52,8 @@ class Session:
         
         if result is None:
             raise ValueError("Did not find result with ID: {:}".format(id))
-            
-        creator = self._resultCreators[result['Type']]
+                  
+        creator = self._resultCreators.get(result['Type'])
 
         if creator is None:
             return Result(result, self.ID)
@@ -72,7 +72,7 @@ class Session:
 
         for _, test in self._data.items():
             print(f'{test["ID"]:<{idSpace}} | {test["Type"]:<{typeSpace}}')
-            
+
         print((idSpace + typeSpace + 3) * "=")
         print()
 

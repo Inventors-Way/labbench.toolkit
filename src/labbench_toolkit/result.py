@@ -14,8 +14,36 @@ class Result:
         print(self._result.keys())
 
     @property
+    def ID(self):
+        return self._result['ID']
+    
+    @property
+    def SessionID(self):
+        return self._sessionId
+    
+    @property
     def Completed(self) -> bool:
-        return self._result['Type'] != 'NullResult'
+        return self._result['Completed'] 
+
+    @property    
+    def Operator(self):
+        return self._result['Operator']
+    
+    @property    
+    def RunningTime(self):
+        return self._result['RunningTime']
+
+    @property
+    def RecordingTime(self):
+        return self._result['RecordingTime']
+    
+    @property
+    def RecordingEndTime(self):
+        return self._result['RecordingEndTime']
+    
+    @property
+    def Iteration(self):
+        return self._result['Iteration']
     
     @property
     def Annotations(self):

@@ -3,9 +3,12 @@ import matplotlib.pyplot as plt
 from matplotlib import gridspec
 import numpy as np
 from labbench_toolkit.psychophysics import Quick
+import statistics
 
 class PsiStopSignalTask:
-    def __init__(self, annotations, sessionId):
+    def __init__(self, result, name = 'Stop Signal Task'):
+        annotations = result.Annotations
+
         self._lowLimit = annotations['sstLowerLimit']
         self._highLimit = annotations['sstHighLimit']
         self._delays = annotations['sstDelays']
@@ -20,27 +23,38 @@ class PsiStopSignalTask:
         self._gtAnswer = annotations['gtAnswer']
         self._lambda = 0.02
         self._gamma = 0.00
-        self._sessionId = sessionId
+        self._sessionId = result.SessionID
+        self._displayPlot = False
+        self._savePlot = False
+        self._name = name
               
-    def reactionTime(self):
-        return [time for time, answer in zip(self._gtTime, self._gtAnswer) if answer == 1]
-            
-    def transform(self, x):
-        return (self._highLimit - self._lowLimit) * (1 - x) + self._lowLimit
+    def Configure(self, display: bool, save: bool):
+        self._displayPlot = display
+        self._savePlot = save
 
-    def betaRange(self):
-        a = self._alpha[-1]
-        b = math.pow(10, self._beta[-1])
-        g = self._gamma
-        l = self._lambda
-        pf = Quick(a, b, g, l)
-        i25 = self.transform(pf.ICDF(0.25))
-        i75 = self.transform(pf.ICDF(0.75))
-        
-        return i75 - i25    
+        return self
+    
+    @property
+    def ReactionTime(self):
+        return statistics.mean(self.GetReactionTimes())
+
+    def GetReactionTimes(self):
+        return [time for time, answer in zip(self._gtTime, self._gtAnswer) if answer == 1]
+
+    @property
+    def StopSignalReactionTime(self):
+        return self.ReactionTime - self.Delay
+    
+    @property
+    def BetaRange(self):
+        return self.ICDF(0.25) - self.ICDF(0.75)
     
     @property
     def Delay(self):
+        return self.ICDF(0.5)
+    
+    @property
+    def StopSignalDelays(self):
         return self._delays
     
     @property
@@ -48,16 +62,6 @@ class PsiStopSignalTask:
         return self._responses
     
     def ICDF(self, p):
-        intensity = np.array(self._delays)
-        response = np.array(self._responses)
-        alpha = [self.transform(x) for x in self._alpha]
-        alphaLower = [self.transform(x) for x in self._alphaLower]
-        alphaUpper = [self.transform(x) for x in self._alphaUpper]
-        
-        Imax = self._highLimit
-        
-        n = np.array(range(0, len(intensity)))
-               
         a = self._alpha[-1]
         b = math.pow(10, self._beta[-1])
         g = self._gamma
@@ -66,7 +70,10 @@ class PsiStopSignalTask:
         
         return self.transform(pf.ICDF(p))        
 
-    def plotEstimation(self):
+    def transform(self, x):
+        return (self._highLimit - self._lowLimit) * (1 - x) + self._lowLimit
+
+    def analyse(self):
         intensity = np.array(self._delays)
         response = np.array(self._responses)
         alpha = [self.transform(x) for x in self._alpha]
@@ -123,10 +130,19 @@ class PsiStopSignalTask:
         # Adjust layout for better spacing
         plt.tight_layout()      
         
-        plt.savefig('{sid} PsiEstimation.png'.format(sid = self._sessionId), dpi=600)
-        plt.show()
+        if (self._savePlot):
+            plt.savefig(self.AnalysisFileName, dpi=600)
+
+        if (self._displayPlot):
+            plt.show()
+
+        plt.close()
         
-    def plotConvergence(self):
+    @property
+    def AnalysisFileName(self):
+        return f'{self._sessionId} {self._name}.png'
+    
+    def analyseConvergence(self):
         alpha = [self.transform(x) for x in self._alpha]
         alphaLower = [self.transform(x) for x in self._alphaLower]
         alphaUpper = [self.transform(x) for x in self._alphaUpper]
@@ -157,5 +173,15 @@ class PsiStopSignalTask:
         plt.tight_layout()
 
         # Show the plot
-        plt.savefig('{sid} PsiConvergence.png'.format(sid=self._sessionId), dpi=600)        
-        plt.show()        
+
+        if (self._savePlot):
+            plt.savefig(self.ConvergenceFilename, dpi=600)
+
+        if (self._displayPlot):
+            plt.show()        
+
+        plt.close()
+
+    @property
+    def ConvergenceFilename(self):
+        return f'{self._sessionId} {self._name} (Convergence).png'
