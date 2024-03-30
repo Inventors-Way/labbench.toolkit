@@ -13,6 +13,9 @@ class Result:
         print('Result keys:')
         print(self._result.keys())
 
+    def __getitem__(self, id):
+        return self._result[id]
+
     @property
     def ID(self):
         return self._result['ID']
