@@ -6,11 +6,9 @@ Created on Sun Nov 19 18:25:03 2023
 """
 import json
 import math
-import matplotlib.pyplot as plt
-from matplotlib import gridspec
-import numpy as np
+from labbench_toolkit.result import ThresholdResult
 
-class LabBenchFile:
+class DataFile:
     def __init__(self, filename):
         with open(filename, 'r') as file:
             self._data = json.load(file)
@@ -19,7 +17,7 @@ class LabBenchFile:
         return self.getData(n)
     
     def getData(self, n):
-        return SessionData(self._data, n)
+        return Session(self._data, n)
     
     def getIDs(self):
         return self._data['id']
@@ -32,7 +30,7 @@ class LabBenchFile:
         for id in self.getIDs():
             print('{id}'.format(id = id))
     
-class SessionData:
+class Session:
     def __init__(self, data, n):
         self._data = data['data'][n]
         self._id = data['id'][n]        
@@ -65,24 +63,6 @@ class SessionData:
         for key, test in self._data.items():
             print(f'{test["ID"]:<{idSpace}} | {test["Type"]:<{typeSpace}}')
 
-class ThresholdResult:
-    def __init__(self, result, sessionId):
-        self._result = result
-        self._channels = [ThresholdChannel(c, sessionId, result['ID']) for c in result['Channels']]
-        self._sessionId = sessionId
-        
-        
-    def describe(self):
-        print('Result keys:')
-        print(self._result.keys())
-    
-    @property
-    def Thresholds(self):
-        return self._result['THR']
-    
-    @property
-    def Channels(self):
-        return self._channels
 
 class ThresholdChannel:
     def __init__(self, channel, sessionId, testId):

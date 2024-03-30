@@ -1,10 +1,10 @@
 [project]
 name = "labbench-toolkit"
-version = "0.0.2"
+version = "0.0.3"
 authors = [
   { name="Kristian Hennings", email="help@inventors.dk" },
 ]
-description = "Toolkit for analysing data recorded with LabBench"
+description = "Toolkit for analysing data from the LabBench software for psychophysical and neuroscience experiments"
 readme = "README.md"
 requires-python = ">=3.8"
 classifiers = [
