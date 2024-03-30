@@ -1,19 +1,35 @@
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
 import numpy as np
+import math
+from labbench_toolkit.psychophysics import Quick
 
-
-class ThresholdResult:
+class Result:
     def __init__(self, result, sessionId):
         self._result = result
-        self._channels = [ThresholdChannel(c, sessionId, result['ID']) for c in result['Channels']]
         self._sessionId = sessionId
-        
-        
+
     def describe(self):
         print('Result keys:')
         print(self._result.keys())
+
+    @property
+    def Completed(self) -> bool:
+        return self._result['Type'] != 'NullResult'
     
+    @property
+    def Annotations(self):
+        return self._result['annotations']
+       
+class EvokedPotentialsResult(Result):
+    def __init__(self, result, sessionId):
+        Result.__init__(self, result, sessionId)        
+
+class ThresholdResult(Result):
+    def __init__(self, result, sessionId):
+        Result.__init__(self, result, sessionId)  
+        self._channels = [ThresholdChannel(c, sessionId, result['ID']) for c in result['Channels']]
+            
     @property
     def Thresholds(self):
         return self._result['THR']
@@ -35,8 +51,9 @@ class ThresholdChannel:
         
         print('FUNCTION')
         print(self._channel['function'].keys())
-        
-    def betaRange(self):
+
+    @property        
+    def BetaRange(self) -> float:
         function = self._channel['function']
         Imax = self._channel['Imax']
         
@@ -50,7 +67,7 @@ class ThresholdChannel:
         
         return i75 - i25
         
-    def plotEstimation(self):
+    def plotEstimation(self) -> None:
         intensity = np.array(self._channel['intensity'])
         response = np.array(self._channel['response'])
         Imax = self._channel['Imax']
@@ -86,7 +103,6 @@ class ThresholdChannel:
         axes[0].set_xlabel('Stimulation Number []')
         axes[0].set_ylabel('Intensity (p) [kPa]')
         
-
         axes[1].plot(cdf, x * Imax, color = 'black')
         axes[1].plot([0, 1], [i50, i50], color ='red')
         axes[1].fill_between([0, 1], [i25, i25], [i75, i75], color='red', alpha=0.1)
