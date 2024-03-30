@@ -3,6 +3,7 @@ from matplotlib import gridspec
 import numpy as np
 import math
 from labbench_toolkit.psychophysics import Quick
+import statistics
 
 class Result:
     def __init__(self, result, sessionId):
@@ -193,3 +194,80 @@ class ThresholdChannel:
         # Show the plot
         plt.savefig('{sid}{tid} Convergence'.format(sid=self._sessionId, tid=self._testId), dpi=600)        
         plt.show()
+
+class AlgometryRatedResult(Result):
+    def __init__(self, result, id) -> None:
+        Result.__init__(self, result, id)
+
+    @property
+    def Time(self):
+        return self._result['Time']
+    
+    @property
+    def StimPressure(self):
+        return self._result['StimPressure']
+
+    @property
+    def VAS(self):
+        return self._result['VAS']
+    
+    def plot(self):
+        pass
+
+class AlgometryStimulusResponseResult(AlgometryRatedResult):
+    def __init__(self, result, id) -> None:
+        AlgometryRatedResult.__init__(self, result, id)
+
+    @property
+    def PDT(self):
+        return self._result['PDT']
+
+    @property
+    def PTT(self):
+        return self._result['PTT']
+
+    @property
+    def PTL(self):
+        return self._result['PTL']
+
+class AlgometryTemporalSummationResult(AlgometryRatedResult):
+    def __init__(self, result, id) -> None:
+        AlgometryRatedResult.__init__(self, result, id)
+
+    @property
+    def Responses(self):
+        return self._result['Responses']
+    
+    @property
+    def VAS1(self):
+        return statistics.mean(self.Responses[-3:])
+    
+    @property
+    def VAS3(self):
+        return statistics.mean(self.Responses[:3])
+
+    @property
+    def TS(self):
+        return self.VAS3 - self.VAS1
+
+class AlgometryConditionedPainResult(AlgometryRatedResult):
+    def __init__(self, result, id) -> None:
+        AlgometryRatedResult.__init__(self, result, id)
+
+    @property
+    def PDT(self):
+        return self._result['PDT']
+
+    @property
+    def PTT(self):
+        return self._result['PTT']
+
+    @property
+    def PTL(self):
+        return self._result['PTL']
+    
+    @property
+    def CondPressure(self):
+        return self._result['CondPressure']
+
+    

@@ -8,6 +8,9 @@ import json
 from labbench_toolkit.result import Result
 from labbench_toolkit.result import ThresholdResult
 from labbench_toolkit.result import EvokedPotentialsResult
+from labbench_toolkit.result import AlgometryStimulusResponseResult
+from labbench_toolkit.result import AlgometryTemporalSummationResult
+from labbench_toolkit.result import AlgometryConditionedPainResult
 
 class DataFile:
     def __init__(self, filename):
@@ -37,7 +40,10 @@ class Session:
         self._id = data['id'][n]
         self._resultCreators = {
             'ThresholdResult': lambda result, id : ThresholdResult(result, id),
-            'EvokedPotentialsResult': lambda result, id : EvokedPotentialsResult(result, id)
+            'EvokedPotentialsResult': lambda result, id : EvokedPotentialsResult(result, id),
+            'AlgometryStimulusResponseResult': lambda result, id : AlgometryStimulusResponseResult(result, id),
+            'AlgometryTemporalSummationResult': lambda result, id : AlgometryTemporalSummationResult(result, id),
+            'AlgometryConditionedPainResult': lambda result, id : AlgometryConditionedPainResult(result, id),
         }        
         
     @property
