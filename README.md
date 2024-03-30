@@ -1,2 +1,4 @@
 # labbench.toolkit
-Toolkit for LabBench
+
+Toolkit for analysing data recorded with the LabBench software.
+
