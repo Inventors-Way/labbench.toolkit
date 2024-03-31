@@ -28,12 +28,16 @@ class PsiStopSignalTask:
         self._savePlot = False
         self._name = name
               
-    def Configure(self, display: bool, save: bool):
-        self._displayPlot = display
-        self._savePlot = save
+    def SaveFiles(self, enable: bool):
+        self._savePlot = enable
 
         return self
-    
+
+    def Display(self, enable: bool):
+        self._displayPlot = enable
+
+        return self
+
     @property
     def ReactionTime(self):
         return statistics.mean(self.GetReactionTimes())
