@@ -57,6 +57,14 @@ class EvokedPotentialsResult(Result):
     def __init__(self, result, sessionId):
         Result.__init__(self, result, sessionId)        
 
+class ManualThresholdResult(Result):
+    def __init__(self, result, sessionId):
+        Result.__init__(self, result, sessionId)  
+    
+    @property
+    def Threshold(self):
+        return self._result['Threshold']
+
 class ThresholdResult(Result):
     def __init__(self, result, sessionId):
         Result.__init__(self, result, sessionId)  
